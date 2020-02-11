@@ -43,6 +43,7 @@ server.get('/api/users', (req, res) => {
 })
 
 // get a user by id, use req.params
+server.get('/api/users/:id', (req, res) => {
 const id  = req.params.id
 
     Users.findById(id)
@@ -57,6 +58,7 @@ const id  = req.params.id
             console.log(err);
             res.status(500).json({errorMessage: "the user info could not be retrieved"})
         })
+})
 
 // delete user with specified id: req.params.id
 server.delete('/api/users/:id', (req, res) => {
@@ -68,7 +70,7 @@ server.delete('/api/users/:id', (req, res) => {
             ?
                 res.status(404).json({error: 'user not found by id' })
             :
-                res.status(200).json(removedUser);
+                res.status(200).json(removedUser)
         })
         .catch(err => {
             console.log(err);
@@ -77,8 +79,29 @@ server.delete('/api/users/:id', (req, res) => {
 })
 
 // update (put) user: req.params.id && req.body
+server.put ('/api/users/:id', (req, res) => {
+    const id = req.params.id
+    const userInfo = req.body
 
+    Users.update(id, userInfo)
+        .then(user => {
+            console.log(user)
+            if(user === 0){
+                res.status(404).json({errorMessage: "user not found"})
+            }
 
+            if(!req.body.name || !req.body.bio) {
+                res.status(400).json({ errorMessage: "Please include name & bio"})
+            }
+            if(user){
+                res.status(200).json(user)
+            }
+        })
+        .catch(err =>{
+            console.log(err)
+            res.status(500).json({ errorMessage: "nope."})
+        })
+})
 
 const port = 5000; //declare our port
 
