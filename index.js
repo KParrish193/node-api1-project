@@ -13,8 +13,22 @@ server.get('/', (req, res) => {
 })
 
 //add (post) a user using info from req.body
+server.post('/api/users', (req, res) => {
+    const userInfo = req.body;
 
-
+    req.body.name && req.body.bio
+    ?
+        Users.insert(userInfo)
+            .then(user => {
+                res.status(201).json(user)
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({errorMessage:"There was an error adding the user"})
+            })
+    :
+            res.status(400).json({ errorMessage: "Name and Bio needed"})
+})
 
 //get users
 server.get('/api/users', (req, res) => {
@@ -45,7 +59,6 @@ const id  = req.params.id
         })
 
 // delete user with specified id: req.params.id
-
 server.delete('/api/users/:id', (req, res) => {
     const id = req.params.id
 
