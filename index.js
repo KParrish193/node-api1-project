@@ -3,14 +3,18 @@ const express = require('express'); //import express
 
 const server = express() //declare server
 
-const Users = require('.data/db.js')
+const Users = require('./data/db.js')
 
-server.use(express.jsaon());
+server.use(express.json());
 
 //initial get
 server.get('/', (req, res) => {
-    res.jason({server: "running"})
+    res.json({server: "running"})
 })
+
+//add (post) a user using info from req.body
+
+
 
 //get users
 server.get('/api/users', (req, res) => {
@@ -23,9 +27,43 @@ server.get('/api/users', (req, res) => {
             res.status(500).json({ errorMessage: "The user info could not be retrieved"})
         })
 })
-//
 
+// get a user by id, use req.params
+const id  = req.params.id
 
+    Users.findById(id)
+        .then(user => {
+            user === undefined
+            ?
+                res.status(404).json({error: 'user not found by id'})
+            :
+                res.status(200).json(user)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({errorMessage: "the user info could not be retrieved"})
+        })
+
+// delete user with specified id: req.params.id
+
+server.delete('/api/users/:id', (req, res) => {
+    const id = req.params.id
+
+    Users.remove(id)
+        .then(removedUser => {
+            removedUser === 0
+            ?
+                res.status(404).json({error: 'user not found by id' })
+            :
+                res.status(200).json(removedUser);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ errorMessage: "user could not be removed"})
+        })
+})
+
+// update (put) user: req.params.id && req.body
 
 
 
