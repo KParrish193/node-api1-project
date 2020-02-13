@@ -13,22 +13,31 @@ server.get('/', (req, res) => {
 })
 
 //add (post) a user using info from req.body
-server.post('/api/users', (req, res) => {
+server.post('/api/users', async (req, res) => {
     const userInfo = req.body;
-
-    req.body.name && req.body.bio
-    ?
+    console.log(req.body)
+    // try { 
+    //     const newUser = await Users.insert(userInfo) 
+    //     res.status(201).json(newUser)
+    // } catch (err) {
+    //     console.log(err);
+    //     res.status(500).json({ errorMessage: "There was an error adding the user"}) 
+    // }
+    if (req.body.name && req.body.bio){
         Users.insert(userInfo)
             .then(user => {
                 res.status(201).json(user)
             })
             .catch(err => {
                 console.log(err);
-                res.status(500).json({errorMessage:"There was an error adding the user"})
+                res.status(500).json({ errorMessage: "There was an error adding the user"})
             })
-    :
+    }
+    else {
             res.status(400).json({ errorMessage: "Name and Bio needed"})
+    }
 })
+
 
 //get users
 server.get('/api/users', (req, res) => {
@@ -50,13 +59,13 @@ const id  = req.params.id
         .then(user => {
             user === undefined
             ?
-                res.status(404).json({error: 'user not found by id'})
+                res.status(404).json({ errorMessage: 'user not found by id'})
             :
                 res.status(200).json(user)
         })
         .catch(err => {
             console.log(err);
-            res.status(500).json({errorMessage: "the user info could not be retrieved"})
+            res.status(500).json({ errorMessage: "the user info could not be retrieved"})
         })
 })
 
@@ -68,7 +77,7 @@ server.delete('/api/users/:id', (req, res) => {
         .then(removedUser => {
             removedUser === 0
             ?
-                res.status(404).json({error: 'user not found by id' })
+                res.status(404).json({ errorMessage: 'user not found by id' })
             :
                 res.status(200).json(removedUser)
         })
@@ -87,7 +96,7 @@ server.put ('/api/users/:id', (req, res) => {
         .then(user => {
             console.log(user)
             if(user === 0){
-                res.status(404).json({errorMessage: "user not found"})
+                res.status(404).json({ errorMessage: "user not found"})
             }
 
             if(!req.body.name || !req.body.bio) {
@@ -95,6 +104,7 @@ server.put ('/api/users/:id', (req, res) => {
             }
             if(user){
                 res.status(200).json(user)
+                //call to return back users 
             }
         })
         .catch(err =>{
@@ -103,6 +113,7 @@ server.put ('/api/users/:id', (req, res) => {
         })
 })
 
-const port = 5000; //declare our port
 
-server.listen(port, () => console.log(`/n API listening on port ${port} \n`)); //tell server to listen on our port
+const port = process.env.PORT || 5000; //declare our port
+server.listen(port, () => console.log(`/n** Running on port ${port} **\n`)); //tell server to listen on our port
+
